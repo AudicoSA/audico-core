@@ -1,0 +1,109 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/audico-core/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  created_at  DateTime @default(now())
+  
+  // Relations
+  quotes       Quote[]
+  chat_sessions ChatSession[]
+  
+  @@map("categories")
+}
+
+model Pricelist {
+  id                String   @id @default(cuid())
+  name              String
+  price_type        String
+  margin_percentage Float
+  uploaded_at       DateTime @default(now())
+  is_active         Boolean  @default(true)
+  
+  // Relations
+  products Product[]
+  
+  @@map("pricelists")
+}
+
+model Product {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  category_id       String
+  pricelist_id      String
+  cost_price        Float
+  retail_price      Float
+  markup_percentage Float
+  is_active         Boolean  @default(true)
+  created_at        DateTime @default(now())
+  embedding         String?
+  content           String?
+  
+  // Relations
+  pricelist    Pricelist    @relation(fields: [pricelist_id], references: [id])
+  quote_items  QuoteItem[]
+  
+  @@map("products")
+}
+
+model Quote {
+  id              String   @id @default(cuid())
+  session_id      String
+  category_id     String
+  status          String   @default("draft")
+  total_amount    Float    @default(0)
+  customer_email  String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  // Relations
+  category     Category     @relation(fields: [category_id], references: [id])
+  quote_items  QuoteItem[]
+  
+  @@map("quotes")
+}
+
+model QuoteItem {
+  id          String   @id @default(cuid())
+  quote_id    String
+  product_id  String
+  quantity    Int      @default(1)
+  unit_price  Float
+  total_price Float
+  added_at    DateTime @default(now())
+  
+  // Relations
+  quote   Quote   @relation(fields: [quote_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+  
+  @@map("quote_items")
+}
+
+model ChatSession {
+  id           String   @id @default(cuid())
+  session_id   String   @unique
+  category_id  String
+  message_type String
+  content      String
+  created_at   DateTime @default(now())
+  
+  // Relations
+  category Category @relation(fields: [category_id], references: [id])
+  
+  @@map("chat_sessions")
+}
