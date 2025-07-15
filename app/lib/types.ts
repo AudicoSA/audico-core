@@ -30,6 +30,14 @@ export interface Quote {
   customer_email?: string;
   created_at: string;
   updated_at: string;
+  quote_items?: (QuoteItem & {
+    product: {
+      id: string;
+      name: string;
+      description: string;
+      retail_price: number;
+    };
+  })[];
 }
 
 export interface QuoteItem {
@@ -56,6 +64,30 @@ export interface ChatMessage {
   type: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
+  products?: ProductRecommendation[];
+  quote?: Quote;
+}
+
+export interface ProductRecommendation {
+  id: string;
+  name: string;
+  description: string;
+  retail_price: number;
+  category_id: string;
+  pricelist_id: string;
+  cost_price: number;
+  markup_percentage: number;
+  is_active: boolean;
+  created_at: string;
+  content?: string;
+  recommendation_reason?: string;
+  priority?: 'high' | 'medium' | 'low';
+  pricelist?: {
+    id: string;
+    name: string;
+    price_type: string;
+    margin_percentage: number;
+  };
 }
 
 export interface MarketCategory {
