@@ -1,0 +1,15 @@
+node_modules
+.next
+.husky
+coverage
+.prettierignore
+.eslintignore
+*.log
+dist
+build
+package-lock.json
+public
+next-env.d.ts
+next.config.js
+next.config.ts
+yarn.lock
